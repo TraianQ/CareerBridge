@@ -1,7 +1,7 @@
 """
 Simuleaza interviul din app.py, dar in locul unui om care raspunde manual la
 chat, raspunsurile sunt generate de un "actor" AI care interpreteaza persoana
-descrisa intr-un fisier de profil (implicit: maria.txt).
+descrisa intr-un fisier de profil (implicit: Profiles/maria.txt).
 
 Util pentru testare rapida a intregului flux (intrebari -> extractie skill-uri
 -> gap -> plan 12 saptamani -> CV), fara sa fie nevoie sa scrii manual
@@ -9,7 +9,7 @@ raspunsuri in interfata Streamlit.
 
 Ruleaza cu:
     python simulate_persona_interview.py
-    python simulate_persona_interview.py --profile maria.txt --role shift_coordinator
+    python simulate_persona_interview.py --profile Profiles/dumitru.txt --role shift_coordinator
 """
 
 import argparse
@@ -107,7 +107,7 @@ def pick_best_role(confirmed_skill_keys):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--profile", default="maria.txt", help="Fisier text cu profilul persoanei")
+    parser.add_argument("--profile", default=os.path.join("Profiles", "maria.txt"), help="Fisier text cu profilul persoanei")
     parser.add_argument("--role", default=None, help="ID de rol tinta (vezi fallback_data/roles_manufacturing.json)")
     parser.add_argument("--name", default="Maria", help="Numele afisat in CV")
     parser.add_argument("--years", default="22", help="Anii de experienta afisati in CV")

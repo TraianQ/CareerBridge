@@ -27,7 +27,7 @@ FALLBACK_QUESTIONS = [
 ]
 
 # Raspuns automat pentru fiecare intrebare de mai sus, cate un set per persoana
-# preseteta, scris in stilul propriu al fiecarui profil (maria.txt / dumitru.txt).
+# preseteta, scris in stilul propriu al fiecarui profil (Profiles/maria.txt / Profiles/dumitru.txt).
 PRESET_PERSONAS = {
     "Maria (fabrică auto, Pitești)": {
         "name": "Maria",

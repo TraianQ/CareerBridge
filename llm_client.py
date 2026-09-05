@@ -125,7 +125,7 @@ Profilul persoanei:
 def answer_as_persona(persona_text, conversation_history):
     """Genereaza raspunsul persoanei la ultima intrebare din conversation_history.
 
-    persona_text: descrierea persoanei (ex: continutul din maria.txt)
+    persona_text: descrierea persoanei (ex: continutul din Profiles/maria.txt)
     conversation_history: lista de dict-uri {role, content}, unde ultimul mesaj
         (role="assistant") e intrebarea la care persoana trebuie sa raspunda.
     """
