@@ -179,11 +179,16 @@ def render_sidebar():
 
         st.markdown("---")
         st.markdown("### Demo automat")
-        st.caption("Alege un profil preseteat -- răspunsurile la interviu sunt generate automat, în stilul persoanei.")
-        persona_key = st.selectbox("Utilizator preseteat", options=list(PRESET_PERSONAS.keys()))
-        if st.button("🤖 Rulează demo automat"):
+        st.caption(
+            "Alege un profil preseteat -- fie răspunzi întrebare cu întrebare folosind butonul "
+            "„Introdu răspunsul lui...” din chat, fie rulezi tot interviul dintr-o dată."
+        )
+        st.selectbox("Utilizator preseteat", options=list(PRESET_PERSONAS.keys()), key="demo_persona_key")
+        if st.button("🤖 Rulează tot interviul automat"):
+            persona_key = st.session_state.demo_persona_key
             for key in list(st.session_state.keys()):
-                del st.session_state[key]
+                if key != "demo_persona_key":
+                    del st.session_state[key]
             init_state()
             run_auto_demo(persona_key)
             st.rerun()
@@ -207,9 +212,13 @@ def main():
 
     stage = st.session_state.stage
 
+    active_persona = PRESET_PERSONAS[st.session_state.demo_persona_key]
+
     # --- STAGE: nume ---
     if stage == "name":
         user_input = st.chat_input("Scrie aici...")
+        if st.button(f"✍️ Introdu răspunsul lui {active_persona['name']}"):
+            user_input = active_persona["name"]
         if user_input:
             add_message("user", user_input)
             st.session_state.name = user_input.strip()
@@ -221,6 +230,8 @@ def main():
     # --- STAGE: ani experienta ---
     elif stage == "years":
         user_input = st.chat_input("Scrie aici...")
+        if st.button(f"✍️ Introdu răspunsul lui {active_persona['name']}"):
+            user_input = active_persona["years"]
         if user_input:
             add_message("user", user_input)
             match = re.search(r"\d+", user_input)
@@ -234,6 +245,9 @@ def main():
     # --- STAGE: interviu narativ ---
     elif stage == "interview":
         user_input = st.chat_input("Scrie aici...")
+        idx = st.session_state.question_index
+        if idx < len(active_persona["answers"]) and st.button(f"✍️ Introdu răspunsul lui {active_persona['name']}"):
+            user_input = active_persona["answers"][idx]
         if user_input:
             add_message("user", user_input)
             current_q = st.session_state.current_question
