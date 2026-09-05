@@ -2,7 +2,7 @@
 
 Chat conversațional care traduce experiența reală de muncă (nu diplomele) în
 competențe numite, mapate pe roluri țintă din producție, cu plan de 12
-săptămâni și CV rescris în limbajul angajatorului.
+săptămâni de pregătire.
 
 ## Rulare rapidă (fără chei API -- mod offline)
 
@@ -36,7 +36,6 @@ app.py                          # UI Streamlit + logica de stare (chat flow)
 llm_client.py                   # wrapper Azure OpenAI / OpenAI, cu fallback
 taxonomy.py                     # extractie skill-uri + mapare pe roluri
 plan_generator.py               # genereaza planul de 12 saptamani
-cv_writer.py                    # genereaza CV-ul rescris
 fallback_data/
   roles_manufacturing.json      # 3 roluri tinta + taxonomia de skill-uri
 ```
@@ -44,7 +43,7 @@ fallback_data/
 ## Ce testezi înainte de pitch
 
 - [ ] Rulează întregul flow (nume → ani → 5 întrebări → confirmare skill-uri
-      → alegere rol → plan + CV) în mod offline, ca să ai un fallback sigur.
+      → alegere rol → plan) în mod offline, ca să ai un fallback sigur.
 - [ ] Testul de fairness: rulează același transcript o dată cu "20 de ani
       experiență" și o dată cu "2 ani experiență" -- verifică că rolurile
       recomandate și competențele extrase nu depind arbitrar de asta, doar

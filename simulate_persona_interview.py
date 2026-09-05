@@ -19,7 +19,6 @@ import re
 import llm_client
 import taxonomy
 import plan_generator
-import cv_writer
 
 FALLBACK_QUESTIONS = [
     "Hai să vorbim despre o zi obișnuită de muncă. Ce faci, pas cu pas, când ajungi la fabrică?",
@@ -109,8 +108,6 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--profile", default=os.path.join("Profiles", "maria.txt"), help="Fisier text cu profilul persoanei")
     parser.add_argument("--role", default=None, help="ID de rol tinta (vezi fallback_data/roles_manufacturing.json)")
-    parser.add_argument("--name", default="Maria", help="Numele afisat in CV")
-    parser.add_argument("--years", default="22", help="Anii de experienta afisati in CV")
     args = parser.parse_args()
 
     profile_path = args.profile if os.path.isabs(args.profile) else os.path.join(
@@ -142,12 +139,10 @@ def main():
     print("Îi lipsește: " + (", ".join(missing) if missing else "-"))
 
     plan_text = plan_generator.generate_12_week_plan(missing, role["title_ro"])
-    cv_text = cv_writer.generate_cv(args.name, args.years, skills, role["id"])
 
     print("\n" + "=" * 60)
     print(plan_text)
     print("=" * 60)
-    print(cv_text)
 
 
 if __name__ == "__main__":

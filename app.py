@@ -1,7 +1,7 @@
 """
 Career Bridge -- MVP demo
 Chat conversational care traduce experienta de munca in skill-uri numite,
-mapeaza pe roluri tinta si genereaza un plan de 12 saptamani + CV rescris.
+mapeaza pe roluri tinta si genereaza un plan de 12 saptamani.
 
 Ruleaza cu: streamlit run app.py
 """
@@ -13,7 +13,6 @@ import streamlit as st
 import llm_client
 import taxonomy
 import plan_generator
-import cv_writer
 import simulate_persona_interview as persona_sim
 
 st.set_page_config(page_title="Career Bridge", page_icon="🌉", layout="centered")
@@ -67,6 +66,37 @@ PRESET_PERSONAS = {
 }
 
 TOTAL_QUESTIONS = len(FALLBACK_QUESTIONS)
+
+# Stil vizual pentru fiecare platforma de cursuri -- culori vii si iconite mari,
+# ca butoanele sa fie usor de recunoscut pentru cineva mai putin obisnuit cu calculatorul.
+COURSE_PLATFORM_STYLE = {
+    "Microsoft Learn": {"emoji": "🟦", "color": "#0078D4"},
+    "Udemy": {"emoji": "🟣", "color": "#A435F0"},
+    "Coursera": {"emoji": "🔵", "color": "#0056D2"},
+}
+
+
+def render_course_link_row(platform_label, url):
+    """Randeaza o linie clara: text cu numele platformei + buton mare, colorat,
+    care deschide link-ul de cautare intr-o fila noua."""
+    style = COURSE_PLATFORM_STYLE.get(platform_label, {"emoji": "🔗", "color": "#555555"})
+    st.markdown(
+        f"""
+        <div style="display:flex; align-items:center; gap:16px; margin:10px 0;
+                    padding:10px 14px; border-radius:10px; background-color:#f5f5f7;">
+            <span style="font-size:1.15rem; min-width:220px;">
+                {style['emoji']} <b>Cursuri {platform_label}</b>
+            </span>
+            <a href="{url}" target="_blank" rel="noopener noreferrer"
+               style="background-color:{style['color']}; color:#ffffff; font-weight:bold;
+                      font-size:1.05rem; padding:12px 26px; border-radius:8px;
+                      text-decoration:none; display:inline-block;">
+                Deschide cursurile ➜
+            </a>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -337,30 +367,35 @@ def main():
             else:
                 st.markdown("_Nimic -- ai deja tot ce e cerut!_")
 
+        missing_labels_included = bool(missing)
         plan_text = plan_generator.generate_12_week_plan(missing, role["title_ro"])
         st.markdown("---")
-        st.markdown(plan_text)
+        st.markdown(f"## Plan de 12 săptămâni -> {role['title_ro']}")
 
-        confirmed_skill_objs = [
-            s for s in st.session_state.extracted_skills
-            if s["key"] in st.session_state.confirmed_skill_keys
-        ]
-        cv_text = cv_writer.generate_cv(
-            st.session_state.name,
-            st.session_state.years_experience,
-            confirmed_skill_objs,
-            role_id,
+        if missing_labels_included:
+            for section in plan_generator.build_plan_sections(missing):
+                st.markdown(f"**Săptămâna {section['start_week']}-{section['end_week']}: {section['label']}**")
+                for platform_label, url in section["course_links"]:
+                    render_course_link_row(platform_label, url)
+                st.markdown(
+                    "Exercițiu practic: scrie 3 exemple din experiența ta care arată deja părți din acest skill."
+                )
+        else:
+            st.markdown(
+                "Ai deja competențele principale cerute de acest rol. "
+                "Cele 12 săptămâni se concentrează pe pregătirea aplicației și a interviurilor."
+            )
+
+        for title, body in plan_generator.FINAL_WEEKS:
+            st.markdown(f"**{title}**")
+            st.markdown(body)
+
+        st.markdown(
+            "_Notă: acest plan arată rolurile cu cerere în zona ta și un traseu posibil de pregătire, "
+            "dar nu garantează angajarea. Validarea finală a competențelor rămâne la angajator._"
         )
 
-        st.markdown("---")
-        st.markdown("### CV rescris")
-        st.markdown(cv_text)
-
-        dl_col1, dl_col2 = st.columns(2)
-        with dl_col1:
-            st.download_button("⬇️ Descarcă planul (.md)", plan_text, file_name="plan_12_saptamani.md")
-        with dl_col2:
-            st.download_button("⬇️ Descarcă CV-ul (.md)", cv_text, file_name="cv.md")
+        st.download_button("⬇️ Descarcă planul (.md)", plan_text, file_name="plan_12_saptamani.md")
 
         if st.button("🔄 Ia-o de la capăt"):
             for key in list(st.session_state.keys()):
