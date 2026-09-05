@@ -94,3 +94,34 @@ def learn_search_url(skill_key):
     terms = SKILLS_TAXONOMY[skill_key]["learn_search_terms"]
     query = terms.replace(" ", "%20")
     return f"https://learn.microsoft.com/en-us/training/browse/?terms={query}"
+
+
+# Platforme de cursuri suportate, cu template de URL de cautare (link real de
+# cautare pe fiecare platforma, nu un curs specific ghicit).
+COURSE_PLATFORMS = {
+    "microsoft_learn": {
+        "label": "Microsoft Learn",
+        "url_template": "https://learn.microsoft.com/en-us/training/browse/?terms={query}",
+    },
+    "udemy": {
+        "label": "Udemy",
+        "url_template": "https://www.udemy.com/courses/search/?q={query}",
+    },
+    "coursera": {
+        "label": "Coursera",
+        "url_template": "https://www.coursera.org/search?query={query}",
+    },
+}
+
+
+def course_search_urls(skill_key, platforms=None):
+    """Returneaza o lista de (platform_label, url) cu link-uri reale de cautare
+    pentru skill-ul dat, pe platformele cerute (implicit toate cele suportate)."""
+    terms = SKILLS_TAXONOMY[skill_key]["learn_search_terms"]
+    query = terms.replace(" ", "%20")
+    keys = platforms or COURSE_PLATFORMS.keys()
+    return [
+        (COURSE_PLATFORMS[key]["label"], COURSE_PLATFORMS[key]["url_template"].format(query=query))
+        for key in keys
+        if key in COURSE_PLATFORMS
+    ]

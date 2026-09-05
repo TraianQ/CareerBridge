@@ -1,5 +1,6 @@
 """Genereaza un plan text de 12 saptamani, distribuind skill-urile lipsa pe
-parcursul saptamanilor, cu link real catre Microsoft Learn pentru fiecare."""
+parcursul saptamanilor, cu link-uri reale de cautare pentru cursuri pe mai
+multe platforme (Microsoft Learn, Udemy, Coursera) pentru fiecare."""
 
 import taxonomy
 
@@ -20,13 +21,14 @@ def generate_12_week_plan(missing_skill_keys, role_title_ro):
     week_num = 1
     for skill_key in missing_skill_keys:
         label = taxonomy.SKILLS_TAXONOMY[skill_key]["label_ro"]
-        url = taxonomy.learn_search_url(skill_key)
+        course_links = taxonomy.course_search_urls(skill_key)
         start_week = week_num
         end_week = min(week_num + weeks_per_skill - 1, 9)
+        lines.append(f"**Saptamana {start_week}-{end_week}: {label}**")
+        for platform_label, url in course_links:
+            lines.append(f"- Cursuri {platform_label}: {url}")
         lines.append(
-            f"**Saptamana {start_week}-{end_week}: {label}**\n"
-            f"- Parcurge modulele Microsoft Learn (gratuit): {url}\n"
-            f"- Exercitiu practic: scrie 3 exemple din experienta ta care arata deja parti din acest skill.\n"
+            "- Exercitiu practic: scrie 3 exemple din experienta ta care arata deja parti din acest skill.\n"
         )
         week_num = end_week + 1
         if week_num > 9:
