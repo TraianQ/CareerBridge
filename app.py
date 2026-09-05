@@ -14,6 +14,7 @@ import llm_client
 import taxonomy
 import plan_generator
 import cv_writer
+import simulate_persona_interview as persona_sim
 
 st.set_page_config(page_title="Career Bridge", page_icon="🌉", layout="centered")
 
@@ -24,6 +25,46 @@ FALLBACK_QUESTIONS = [
     "Lucrezi și cu alți colegi sau alte echipe? Cum comunici cu ei în timpul turei?",
     "Ai instruit vreodată pe cineva nou la job, sau ai fost responsabil de alți oameni la un moment dat?",
 ]
+
+# Raspuns automat pentru fiecare intrebare de mai sus, cate un set per persoana
+# preseteta, scris in stilul propriu al fiecarui profil (maria.txt / dumitru.txt).
+PRESET_PERSONAS = {
+    "Maria (fabrică auto, Pitești)": {
+        "name": "Maria",
+        "years": "22",
+        "years_question": "Câți ani ai lucrat în producție / fabrică?",
+        "answers": [
+            "Ajung la fabrică, îmi iau echipamentul de protecție și mă duc direct pe linie. "
+            "Verific piesele care ies de pe bandă, una câte una, și semnez fișele de control.",
+            "Mă uit dacă piesa are vreun defect vizibil sau nu se încadrează la dimensiuni -- "
+            "dacă găsesc o rebut, o pun deoparte și decid dacă opresc linia sau doar marchez lotul.",
+            "Dacă apare o problemă, opresc banda, chem șeful de tură și completez un raport de incident "
+            "ca să rămână scris ce s-a întâmplat și ce am făcut.",
+            "Da, vorbesc și cu cei de la mentenanță când utilajul face probleme, și cu șeful de tură "
+            "în fiecare zi ca să-i spun ce am găsit.",
+            "Am arătat de multe ori colegilor noi cum se verifică piesele corect, mai ales celor "
+            "care abia veneau pe linie.",
+        ],
+    },
+    "Dumitru (dispecerat transport, Suceava)": {
+        "name": "Dumitru",
+        "years": "18",
+        "years_question": "Câți ani ai lucrat în dispecerat / transport marfă?",
+        "answers": [
+            # Dumitru e scurt, practic, vorbeste despre soferi, curse si trasee -- nu despre linii de productie.
+            "Vin la birou, mă uit peste cursele din ziua respectivă și pe hartă -- văd unde sunt șoferii, "
+            "ce trasee au și dacă e ceva blocaj sau vreme urâtă pe drum.",
+            "Verific dacă vreo cursă întârzie și decid dacă schimb ruta unui șofer sau îl trimit pe altul "
+            "mai aproape, ca marfa să ajungă la timp la client.",
+            "Dacă se strică o mașină sau se blochează un drum, sun imediat șoferul, găsesc alt traseu sau "
+            "alt șofer liber și anunț clientul cât întârzie livrarea.",
+            "Sigur, vorbesc tot timpul cu șoferii pe telefon și cu cei de la depozit, ca să știm ce se "
+            "încarcă și pe unde pleacă fiecare cursă.",
+            "Am explicat de multe ori dispecerilor mai noi cum se citește harta traficului și cum alegi "
+            "repede un traseu alternativ când unul e blocat.",
+        ],
+    },
+}
 
 TOTAL_QUESTIONS = len(FALLBACK_QUESTIONS)
 
@@ -54,6 +95,49 @@ def init_state():
 
 def add_message(role, content):
     st.session_state.messages.append({"role": role, "content": content})
+
+
+def run_auto_demo(persona_key):
+    """Raspunde automat la fiecare intrebare de interviu cu textul preseteat pentru
+    persona aleasa si populeaza starea aplicatiei ca si cum utilizatorul ar fi
+    raspuns manual, direct pana la ecranul final."""
+    persona = PRESET_PERSONAS[persona_key]
+    interview_qas = list(zip(FALLBACK_QUESTIONS, persona["answers"]))
+
+    st.session_state.name = persona["name"]
+    st.session_state.years_experience = persona["years"]
+    st.session_state.interview_qas = interview_qas
+    st.session_state.question_index = TOTAL_QUESTIONS
+
+    add_message("user", persona["name"])
+    add_message("assistant", f"Mă bucur, {persona['name']}! {persona['years_question']}")
+    add_message("user", persona["years"])
+    for q, a in interview_qas:
+        add_message("assistant", q)
+        add_message("user", a)
+
+    skills = taxonomy.extract_skills_from_transcript(full_transcript_text())
+    st.session_state.extracted_skills = skills
+    st.session_state.confirmed_skill_keys = [s["key"] for s in skills]
+
+    if skills:
+        lines = ["(Demo automat) Uite ce am înțeles din răspunsurile simulate:\n"]
+        for s in skills:
+            lines.append(f"- **{s['label_ro']}** -- ai spus: \"{s['evidence']}\"")
+        summary = "\n".join(lines)
+    else:
+        summary = "(Demo automat) Nu am identificat competențe clare din răspunsurile simulate."
+    add_message("assistant", summary)
+
+    role = persona_sim.pick_best_role(st.session_state.confirmed_skill_keys)
+    st.session_state.selected_role_id = role["id"]
+    add_message(
+        "assistant",
+        f"(Demo automat) Am confirmat competențele de mai sus și am ales automat rolul "
+        f"**{role['title_ro']} ({role['title_en']})**, cel mai apropiat de ce ai povestit.",
+    )
+
+    st.session_state.stage = "output"
 
 
 def full_transcript_text():
@@ -92,6 +176,17 @@ def render_sidebar():
         )
         mode = "LLM activ (Azure OpenAI / OpenAI)" if llm_client.LLM_AVAILABLE else "Mod offline (fallback local)"
         st.info(f"Mod curent: {mode}")
+
+        st.markdown("---")
+        st.markdown("### Demo automat")
+        st.caption("Alege un profil preseteat -- răspunsurile la interviu sunt generate automat, în stilul persoanei.")
+        persona_key = st.selectbox("Utilizator preseteat", options=list(PRESET_PERSONAS.keys()))
+        if st.button("🤖 Rulează demo automat"):
+            for key in list(st.session_state.keys()):
+                del st.session_state[key]
+            init_state()
+            run_auto_demo(persona_key)
+            st.rerun()
 
 
 # ---------------------------------------------------------------------------

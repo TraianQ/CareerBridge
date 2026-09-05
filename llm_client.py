@@ -101,3 +101,36 @@ def extract_skills_llm(transcript_text):
     raw = _chat(messages, max_tokens=500, temperature=0.1)
     cleaned = raw.strip().strip("`").replace("json\n", "", 1)
     return json.loads(cleaned)
+
+
+# ---------------------------------------------------------------------------
+# 3. Simularea raspunsurilor unei persoane (persona), pe baza unui profil text
+#    Util pentru testarea interviului (app.py) fara input manual.
+# ---------------------------------------------------------------------------
+
+PERSONA_SYSTEM_PROMPT_TEMPLATE = """Interpretezi rolul unei persoane reale, descrisa mai jos.
+Raspunzi la intrebarile unui consilier de cariera EXACT asa cum ar raspunde aceasta persoana:
+la persoana intai, in romana vorbita, cu propriile ei cuvinte si nivel de vocabular
+(fara termeni tehnici de HR/IT pe care persoana nu i-ar folosi), cu exemple concrete
+din munca ei descrisa mai jos. Raspunsurile sunt scurte (2-4 fraze), naturale, ca intr-o
+conversatie reala, nu ca o lista. Nu iesi din personaj si nu mentiona ca esti un AI.
+
+Profilul persoanei:
+---
+{persona_text}
+---
+"""
+
+
+def answer_as_persona(persona_text, conversation_history):
+    """Genereaza raspunsul persoanei la ultima intrebare din conversation_history.
+
+    persona_text: descrierea persoanei (ex: continutul din maria.txt)
+    conversation_history: lista de dict-uri {role, content}, unde ultimul mesaj
+        (role="assistant") e intrebarea la care persoana trebuie sa raspunda.
+    """
+    if not LLM_AVAILABLE:
+        raise RuntimeError("mock mode")
+    system_prompt = PERSONA_SYSTEM_PROMPT_TEMPLATE.format(persona_text=persona_text)
+    messages = [{"role": "system", "content": system_prompt}] + conversation_history
+    return _chat(messages, max_tokens=200, temperature=0.6).strip()
