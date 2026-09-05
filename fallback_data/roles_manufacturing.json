@@ -1,0 +1,84 @@
+{
+  "skills_taxonomy": {
+    "quality_inspection": {
+      "label_ro": "Control / inspecție calitate",
+      "label_en": "Quality Inspection / Process Quality Control",
+      "keywords_ro": ["verific loturile", "control calitate", "verificare produs", "inspectez", "defecte", "conformitate produs", "verific piesele", "rebut", "verificare vizuala"],
+      "learn_search_terms": "quality management fundamentals"
+    },
+    "shift_coordination": {
+      "label_ro": "Coordonare de schimb / echipă",
+      "label_en": "Shift Coordination / Team Scheduling",
+      "keywords_ro": ["coordonez tura", "sef de tura", "organizez echipa", "impart sarcinile", "planific tura", "conduc echipa", "coordonare schimb"],
+      "learn_search_terms": "team leadership fundamentals"
+    },
+    "safety_compliance": {
+      "label_ro": "Conformitate SSM / siguranță",
+      "label_en": "Health & Safety Compliance",
+      "keywords_ro": ["ssm", "protectia muncii", "echipament protectie", "norme de siguranta", "raportez incident", "verific echipamentul de protectie", "siguranta la locul de munca"],
+      "learn_search_terms": "workplace safety compliance"
+    },
+    "incident_reporting": {
+      "label_ro": "Raportare incidente / documentare",
+      "label_en": "Incident Reporting & Documentation",
+      "keywords_ro": ["completez raport", "documentez incident", "scriu raport", "notific probleme", "jurnal de tura", "raport de tura"],
+      "learn_search_terms": "documentation and reporting skills"
+    },
+    "equipment_maintenance": {
+      "label_ro": "Mentenanță de bază echipamente",
+      "label_en": "Basic Equipment Maintenance",
+      "keywords_ro": ["intretin utilajul", "reparatii minore", "verific masina", "mentenanta", "curatare utilaj", "revizie"],
+      "learn_search_terms": "equipment maintenance basics"
+    },
+    "training_new_staff": {
+      "label_ro": "Instruire colegi noi",
+      "label_en": "On-the-job Training / Mentoring",
+      "keywords_ro": ["instruiesc colegi", "explic noilor angajati", "arat cum se face", "mentorez", "invat pe altii"],
+      "learn_search_terms": "mentoring and coaching skills"
+    },
+    "process_documentation": {
+      "label_ro": "Documentare proces / proceduri",
+      "label_en": "Process Documentation",
+      "keywords_ro": ["urmez procedura", "completez fise", "documentez procesul", "respect standardul", "fisa de proces"],
+      "learn_search_terms": "process documentation fundamentals"
+    },
+    "problem_solving_production": {
+      "label_ro": "Rezolvare probleme pe linia de producție",
+      "label_en": "Production Problem-Solving",
+      "keywords_ro": ["rezolv problema", "opresc linia", "identific cauza", "remediez", "gasesc solutia"],
+      "learn_search_terms": "root cause problem solving"
+    },
+    "communication_cross_team": {
+      "label_ro": "Comunicare inter-departamente",
+      "label_en": "Cross-team Communication",
+      "keywords_ro": ["comunic cu alt departament", "raportez sefului", "colaborez cu", "informez echipa"],
+      "learn_search_terms": "workplace communication skills"
+    },
+    "statistical_process_control": {
+      "label_ro": "Control statistic al procesului",
+      "label_en": "Statistical Process Control (SPC)",
+      "keywords_ro": ["masuratori", "grafic de control", "date de proces", "analizez datele", "tolerante"],
+      "learn_search_terms": "statistical process control introduction"
+    }
+  },
+  "roles": [
+    {
+      "id": "quality_control_technician",
+      "title_ro": "Tehnician Control Calitate",
+      "title_en": "Quality Control Technician",
+      "required_skills": ["quality_inspection", "process_documentation", "statistical_process_control", "incident_reporting"]
+    },
+    {
+      "id": "shift_coordinator",
+      "title_ro": "Coordonator de Schimb / Producție",
+      "title_en": "Production Shift Coordinator",
+      "required_skills": ["shift_coordination", "communication_cross_team", "training_new_staff", "safety_compliance", "incident_reporting"]
+    },
+    {
+      "id": "safety_compliance_officer",
+      "title_ro": "Responsabil Conformitate SSM",
+      "title_en": "Health & Safety Compliance Officer",
+      "required_skills": ["safety_compliance", "incident_reporting", "process_documentation", "communication_cross_team"]
+    }
+  ]
+}
